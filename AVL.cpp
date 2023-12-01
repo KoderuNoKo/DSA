@@ -17,7 +17,7 @@ void printNSpace(int n)
         cout << " ";
 }
 
-void printInteger(int& n)
+void printInteger(int &n)
 {
     cout << n << " ";
 }
@@ -28,9 +28,9 @@ class AVLTree
 public:
     class Node;
 private:
-    Node* root;
+    Node *root;
 protected:
-    int getHeightRec(Node* node)
+    int getHeightRec(Node *node)
     {
         if (node == NULL)
             return 0;
@@ -40,7 +40,7 @@ protected:
     }
 public:
     AVLTree() : root(nullptr) {}
-    ~AVLTree() {}
+    ~AVLTree(){}
     int getHeight()
     {
         return this->getHeightRec(this->root);
@@ -53,9 +53,9 @@ public:
             cout << "NULL\n";
             return;
         }
-        queue<Node*> q;
+        queue<Node *> q;
         q.push(root);
-        Node* temp;
+        Node *temp;
         int count = 0;
         int maxNode = 1;
         int level = 0;
@@ -93,73 +93,70 @@ public:
         }
     }
 
-    //Helping functions
-    Node* insertRec(Node* root, const T& value)
-    {
-        if (!root) {
-            return new Node(value);
-        }
-        if (value >= root->data) {
-            root->pRight = insertRec(root->pRight, value);
-        }
-        else {
-            root->pLeft = insertRec(root->pLeft, value);
-        }
-
-            // balance
-            int balance = getHeightRec(root->pRight) - getHeightRec(root->pLeft);
-
-            // left left
-            if (balance < -1 && value < root->pLeft->data) {
-                return rotateRight(root);
-            }
-
-            // right right
-            if (balance > 1 && value >= root->pRight->data) {
-                return rotateLeft(root);
-            }
-
-            // left right
-            if (balance < -1 && value >= root->pLeft->data) {
-                root->pLeft = rotateLeft(root->pLeft);
-                return rotateRight(root);
-            }
-
-            // right left
-            if (balance > 1 && value < root->pRight->data) {
-                root->pRight = rotateRight(root->pRight);
-                return rotateLeft(root);
-            }
-
-            return root;
+//Helping functions
+Node* insertRec(Node* root, const T& value)
+{
+    if (!root) {
+        return new Node (value);
     }
+    if (value >= root->data) {
+        root->pRight = insertRec(root->pRight, value);
+    }
+    else {
+        root->pLeft = insertRec(root->pLeft, value);
+    }
+    
+    // balance
+    int balance = getHeightRec(root->pRight) - getHeightRec(root->pLeft);
+    
+    // left left
+    if (balance < -1 && value < root->pLeft->data) {
+        return rotateRight(root);
+    }
+    
+    // right right
+    if (balance >  1 && value >= root->pRight->data) {
+        return rotateLeft(root);
+    }
+    
+    // left right
+    if (balance < -1 && value >= root->pLeft->data) {
+        root->pLeft = rotateLeft(root->pLeft);
+        return rotateRight(root);
+    }
+    
+    // right left
+    if (balance > 1 && value < root->pRight->data) {
+        root->pRight = rotateRight(root->pRight);
+        return rotateLeft(root);
+    }
+    return root;
+}
+void insert(const T &value){
+    //TODO
+    this->root = insertRec(this->root, value);   // insert value (unbalancy unhandled)
+}
+int getBalance(Node* subroot){
+    if(!subroot) return 0;
+    return getHeightRec(subroot->pLeft)- getHeightRec(subroot->pRight);
+}
+Node* rotateRight(Node* root) {
+    //TODO: Rotate and return new root after rotate
+    Node* temp = root->pLeft;
+    Node* rTemp = temp->pRight;
+    temp->pRight = root;
+    root->pLeft = rTemp;
+    return temp;
+}
 
-    void insert(const T& value) {
-        //TODO
-        this->root = insertRec(this->root, value);   // insert value (unbalancy unhandled)
-    }
-
-    int getBalance(Node* subroot) {
-        if (!subroot) return 0;
-        return getHeightRec(subroot->pLeft) - getHeightRec(subroot->pRight);
-    }
-    Node* rotateRight(Node* root) {
-        //TODO: Rotate and return new root after rotate
-        Node* temp = root->pLeft;
-        Node* rTemp = temp->pRight;
-        temp->pRight = root;
-        root->pLeft = rTemp;
-        return temp;
-    }
-
-    Node* rotateLeft(Node* root) {
-        //TODO: Rotate and return new root after rotate
-        Node* temp = root->pRight;
-        Node* lTemp = temp->pLeft;
-        temp->pLeft = root;
-        root->pRight = lTemp;
-        return temp;
-    }
+Node* rotateLeft(Node* root) {
+    //TODO: Rotate and return new root after rotate
+    Node* temp = root->pRight;
+    Node* lTemp = temp->pLeft;
+    temp->pLeft = root;
+    root->pRight = lTemp;
+    return temp;
+}
 
 int balanced(Node* root)
 {
@@ -195,6 +192,9 @@ Node* rotate(Node* root)
 
 Node* removeRec(Node* root, const T& value)
 {
+    if (!root) {
+        return root;
+    }
     if (value > root->data) {
         root->pRight = removeRec(root->pRight, value);
         root = rotate(root);
@@ -214,7 +214,7 @@ Node* removeRec(Node* root, const T& value)
             return temp;
         }
         else if (!root->pRight) {
-            Node* temp = root->pRight;
+            Node* temp = root->pLeft;
             delete root;
             return temp;
         }
@@ -237,43 +237,42 @@ void remove(const T& value)
     this->root = removeRec(this->root, value);
 }
 
-    void inTrav(Node* root)
-    {
-        if (!root) {
-            return;
-        }
-        inTrav(root->pLeft);
-        cout << root->data << " ";
-        inTrav(root->pRight);
+void inTrav(Node* root)
+{
+    if (!root) {
+        return;
     }
-    void printInorder() {
-        //TODO
-        inTrav(this->root);
-    }
+    inTrav(root->pLeft);
+    cout << root->data << " ";
+    inTrav(root->pRight);
+}
+void printInorder(){
+    //TODO
+    inTrav(this->root);
+}
 
-    bool searchRec(Node* root, const T& value)
-    {
-        if (!root) {
-            return false;
-        }
-        if (value > root->data) {
-            return searchRec(root->pRight, value);
-        }
-        if (value < root->data) {
-            return searchRec(root->pLeft, value);
-        }
-        return true;
+bool searchRec(Node* root, const T& value)
+{
+    if (!root) {
+        return false;
     }
-    bool search(const T& value) {
-        //TODO
-        return searchRec(this->root, value);
+    if (value > root->data) {
+        return searchRec(root->pRight, value);
     }
-
+    if (value < root->data) {
+        return searchRec(root->pLeft, value);
+    }
+    return true;
+}
+bool search(const T &value){
+    //TODO
+    return searchRec(this->root, value);
+}
     class Node
     {
     private:
         T data;
-        Node* pLeft, * pRight;
+        Node *pLeft, *pRight;
         BalanceValue balance;
         friend class AVLTree<T>;
 
@@ -282,4 +281,3 @@ void remove(const T& value)
         ~Node() {}
     };
 };
-
