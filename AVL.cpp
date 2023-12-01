@@ -246,6 +246,171 @@ public:
         }
     }
 
+int balanced(Node* root)
+{
+    return getHeightRec(root->pRight) - getHeightRec(root->pLeft);
+}
+
+Node* rotate(Node* root)
+{
+    if (balanced(root) < -1) // left
+    {
+        if (balanced(root->pLeft) <= 0) { // left
+            root = rotateRight(root);
+        }
+        else { // right
+            root->pLeft = rotateLeft(root->pLeft);
+            root = rotateRight(root);
+        }
+    }
+    else if (balanced(root) > 1) // right
+    {
+        if (balanced(root->pRight) >= 0) { // right
+            root = rotateLeft(root);
+        }
+        else { // left
+            root->pRight = rotateRight(root->pRight);
+            root = rotateLeft(root);
+        }
+    }
+    return root;
+}
+
+Node* removeRec(Node* root, const T& value)
+{
+    if (!root) {        // empty tree
+        return root;
+    }
+    
+    if (value < root->data) {
+        root->pLeft = removeRec(root->pLeft, value);
+        root = rotate(root);
+    }
+    else if (value > root->data) {
+        root->pRight = removeRec(root->pRight, value);
+        root = rotate(root);
+    }
+    else // found
+    {
+        if (!root->pLeft && !root->pRight) {    // node is leaf
+            delete root;
+            return nullptr;
+        }
+        else if (!root->pLeft) {
+            Node* temp = root->pRight;          // node dont has left child
+            delete root;
+            return temp;
+        }
+        else if (!root->pRight) {               // node dont has right child
+            Node* temp = root->pLeft;
+            delete root;
+            return temp;
+        }
+        else                                    // node has both child
+        {
+            Node* replace = root->pLeft;
+            while (replace->pRight) {
+                replace = replace->pRight;
+            }
+            
+            root->data = replace->data;
+            root->pLeft = removeRec(root->pLeft, replace->data);
+        }
+    }
+    return root;
+}
+
+void remove(const T& value)
+{
+    this->root = removeRec(this->root, value);
+}
+
+
+Node* removeRec(Node* root, const T& value)
+{
+    if (!root) {        // empty tree
+        return root;
+    }
+    
+    if (value < root->data) {
+        root->pLeft = removeRec(root->pLeft, value);
+        while (true)
+        {
+            if (balanced(root) ==1)
+            {
+                root->balance =LH;
+                break;
+            }
+            if (balanced(root) ==0)
+            {
+                root->balance = EH;
+                break;
+            }
+            if (balanced(root) ==-1)
+            {
+                root->balance = RH;
+                break;
+            }
+            root = rotate(root);
+        }
+    }
+    else if (value > root->data) {
+        root->pRight = removeRec(root->pRight, value);
+        while (true)
+        {
+            if (balanced(root) ==1)
+            {
+                root->balance =LH;
+                break;
+            }
+            if (balanced(root) ==0)
+            {
+                root->balance = EH;
+                break;
+            }
+            if (balanced(root) ==-1)
+            {
+                root->balance = RH;
+                break;
+            }
+            root = rotate(root);
+        }    
+    }
+    else // found
+    {
+        if (!root->pLeft && !root->pRight) {    // node is leaf
+            delete root;
+            return nullptr;
+        }
+        else if (!root->pLeft) {
+            Node* temp = root->pRight;          // node dont has left child
+            delete root;
+            return temp;
+        }
+        else if (!root->pRight) {               // node dont has right child
+            Node* temp = root->pLeft;
+            delete root;
+            return temp;
+        }
+        else                                    // node has both child
+        {
+            Node* replace = root->pLeft;
+            while (replace->pRight) {
+                replace = replace->pRight;
+            }
+            
+            root->data = replace->data;
+            root->pLeft = removeRec(root->pLeft, replace->data);
+        }
+    }
+    return root;
+}
+
+void remove(const T& value)
+{
+    this->root = removeRec(this->root, value);
+}
+
     void inTrav(Node* root)
     {
         if (!root) {
