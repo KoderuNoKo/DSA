@@ -42,3 +42,60 @@ static void heapSort(T* start, T* end){
     //print
     Sorting<T>::printArray(start,end);
 }
+
+//Helping functions go here
+static int parent(const int& idx) { return (idx - 1) / 2; }
+
+static void reheapUp(T* arr, int idx)
+{
+    int parentidx = parent(idx);
+    while (parentidx > 0) 
+    {
+        if (arr[parentidx] > arr[idx]) {
+            swap(arr[parentidx], arr[idx]);
+        }
+        idx = parentidx;
+        parentidx = parent(parentidx);
+    }
+    if (arr[parentidx] > arr[idx]) {
+        swap(arr[parentidx], arr[idx]);
+    }
+}
+
+static void reheapDown(T* arr, int idx,const int& size)
+{
+    if (2 * idx + 1 >= size) {
+        return;
+    }
+    
+    int childidx = 0;
+    if (2 * idx + 2 >= size) {
+        childidx = 2 * idx + 1;
+    }
+    else {
+        childidx = 2 * idx + ( (arr[2 * idx + 1] < arr[2 * idx + 2]) ? 1 : 2 );
+    }
+    
+    if (arr[idx] > arr[childidx]) {
+        swap(arr[idx], arr[childidx]);
+    }
+    reheapDown(arr, childidx, size);
+}
+
+static void heapSort(T* start, T* end) {
+    //TODO
+    int size = end - start;
+    if (size <= 1) {
+        return;
+    }
+    
+    // build the heap
+    for (int i = size - 1; i >= 0; i--) {
+        reheapUp(start, i);
+    }
+    // sort
+    for (int i = 1; i < size; i++) {
+        reheapDown(start + i, 0, size - i);
+    }
+    Sorting<T>::printArray(start,end);
+}
