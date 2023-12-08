@@ -1,19 +1,20 @@
 int binarySearch(int arr[], int left, int right, int x)
 {
-    if (left > right) {
+    if(left > right) {
         return -1;
     }
-    int mid = (left + right) / 2;
+    
+    int mid = (right + left) / 2;
     
     cout << "We traverse on index: " << mid << endl;
-    if (arr[mid] == x) {
-        return mid;
-    }
     
     if (x > arr[mid]) {
         return binarySearch(arr, mid + 1, right, x);
     }
-    return binarySearch(arr, left, mid - 1, x);
+    if (x < arr[mid]) {
+        return binarySearch(arr, left, mid - 1, x);
+    }
+    return mid;
 }
 
 #include <iostream>
@@ -65,19 +66,16 @@ private:
 
 template<class T>
 int Heap<T>::size(){
-    return this->count;
+    return count;
 }
 
 template<class T>
 bool Heap<T>::isEmpty(){
-    return (this->count == 0);
+    return (count == 0);
 }
 
 template<class T>
 T Heap<T>::peek(){
-    if (this->isEmpty()) {
-        return -1;
-    }
     return elements[0];
 }
 
@@ -87,7 +85,7 @@ bool Heap<T>::contains(T item){
         if (elements[i] == item) {
             return true;
         }
-    } 
+    }
     return false;
 }
 
@@ -97,49 +95,50 @@ bool Heap<T>::pop(){
         return false;
     }
     elements[0] = elements[--count];
-    this->reheapDown(0);
+    reheapDown(0);
     return true;
 }
 
 template<class T>
-void Heap<T>::push(T item)
-{
-    if (count == capacity) {
-        this->ensureCapacity(capacity*2);
-    }
+void Heap<T>::push(T item){
+    ensureCapacity(count + 1);
     elements[count] = item;
-    reheapUp(count);
-    count++;
+    reheapUp(count++);
 }
 
 template<class T>
-void Heap<T>::ensureCapacity(int minCapacity){
-    if (minCapacity <= this->capacity) {
-        return;
-    }
-    T* newElements = new T [minCapacity];
-    for (int i = 0; i < capacity; i++) {
-        newElements[i] = elements[i];
-    }
-    delete[] elements;
-    elements = newElements;
-    capacity = minCapacity;
-    
-}
-
-int parent(const int& pos) { return (pos - 1)/2; }
-
-template<class T>
-void Heap<T>::reheapUp(int position){
-    int parentIdx = parent(position);
-    while (parentIdx >= 0) {
-        if (elements[position] <= elements[parentIdx]) {
-            break;
+void Heap<T>::ensureCapacity(int minCapacity)
+{
+    if (capacity < minCapacity) {
+        capacity *= 2;
+        
+        T* newElements = new T[capacity];
+        for (int i = 0; i < count; i++) {
+            newElements[i] = elements[i];
         }
-        swap(elements[position], elements[parentIdx]);
+        
+        delete[] elements;
+        elements = newElements;
+    }
+}
+
+int parent(int pos) { return (pos - 1) / 2; }
+
+template<class T>
+void Heap<T>::reheapUp(int position)
+{
+    int parentIdx = parent(position);
+    
+    while (parentIdx > 0) {
+        if (elements[parentIdx] < elements[position]) {
+            swap(elements[position], elements[parentIdx]);
+        }
         position = parentIdx;
         parentIdx = parent(parentIdx);
     }
+            if (elements[parentIdx] < elements[position]) {
+            swap(elements[position], elements[parentIdx]);
+        }
 }
 
 int interpolationSearch(int arr[], int left, int right, int x)
@@ -147,17 +146,22 @@ int interpolationSearch(int arr[], int left, int right, int x)
     if (x < arr[left] || x > arr[right]) {
         return -1;
     }
+    
     if (left == right) {
-        if (arr[left] == x) {
-            return right;
+        if (arr[right] == x) {
+            return left;
         }
         return -1;
     }
-    int pos = left + (double)( ((x - arr[left])*(right - left))/(arr[right] - arr[left]) );
+    
+    int pos = left + (double)((x - arr[left]) * (right - left) / (arr[right] - arr[left]));
+    
     if (pos < 0) {
         return -1;
     }
-    cout << "We traverse on index: " << pos << endl;
+    
+    cout << "We traverse on index: " << pos << endl;    
+    
     if (x > arr[pos]) {
         return interpolationSearch(arr, pos + 1, right, x);
     }
@@ -167,49 +171,47 @@ int interpolationSearch(int arr[], int left, int right, int x)
     return pos;
 }
 
-bool isLeaf(int idx, int max) { return (idx * 2 + 1) >= max; }
-int parent(int idx) { return (idx - 1) / 2; }
-
 void reheapDown(int maxHeap[], int numberOfElements, int idx)
 {
-    if (isLeaf(idx, numberOfElements)) {
+    if (2 * idx + 1 >= numberOfElements) {
         return;
     }
-    int childidx = idx * 2 + ((maxHeap[idx * 2 + 1] > maxHeap[idx * 2 + 2]) ? 1 : 2);
-    if (maxHeap[idx] < maxHeap[childidx]) {
-        int temp = maxHeap[idx];
-        maxHeap[idx] = maxHeap[childidx];
-        maxHeap[childidx] = temp;
+    
+    int child = 2 * idx + 1;
+    
+    if (child + 1 < numberOfElements) {
+        child += (maxHeap[child] < maxHeap[child + 1]);
     }
-    reheapDown(maxHeap, numberOfElements, childidx);
+    
+    if (maxHeap[child] > maxHeap[idx]) {
+        swap(maxHeap[child], maxHeap[idx]);
+        reheapDown(maxHeap, numberOfElements, child);
+    }
 }
 
-void reheapUp(int maxHeap[], int numberOfElements, int idx) 
+void reheapUp(int maxHeap[], int numberOfElements, int index)
 {
-    int parentIdx = parent(idx);
+    int parentIdx = (index - 1) / 2;
     while (parentIdx > 0) 
     {
-        if (maxHeap[parentIdx] < maxHeap[idx]) {
-            int temp = maxHeap[parentIdx];
-            maxHeap[parentIdx] = maxHeap[idx];
-            maxHeap[idx] = temp;
+        if (maxHeap[index] > maxHeap[parentIdx]) {
+            swap(maxHeap[index], maxHeap[parentIdx]);
         }
-        idx = parentIdx;
-        parentIdx = parent(parentIdx);
+        index = parentIdx;
+        parentIdx = (parentIdx - 1) / 2;
     }
-    if (maxHeap[parentIdx] < maxHeap[idx]) {
-            int temp = maxHeap[parentIdx];
-            maxHeap[parentIdx] = maxHeap[idx];
-            maxHeap[idx] = temp;
-    }
+        if (maxHeap[index] > maxHeap[parentIdx]) {
+            swap(maxHeap[index], maxHeap[parentIdx]);
+        }
 }
 
-int jumpSearch(int arr[], int x, int n) {
+int jumpSearch(int arr[], int x, int n) 
+{
     // TODO: print the traversed indexes and return the index of value x in array if x is found, 
     // otherwise, return -1.
-    int jump = (int)(sqrt(n));
+    int jump = sqrt(n);
     int i = 0;
-    for (; jump * i < n; i++) 
+    for (; jump * i < n; i++)
     {
         cout << jump * i << " ";
         if (arr[jump * i] == x) {
@@ -220,12 +222,11 @@ int jumpSearch(int arr[], int x, int n) {
         }
     }
     
-    if (i == 0) {
-        return -1;
-    }
-    else if (jump * i >= n) {
+    if (i * jump >= n) 
+    {
         int j = 0;
-        for (j = (i - 1) * jump + 1; j < n; j++) {
+        for (j = (i - 1) * jump + 1; j < n; j++) 
+        {
             cout << j << " ";
             if (arr[j] == x) {
                 return j;
@@ -235,8 +236,8 @@ int jumpSearch(int arr[], int x, int n) {
         return -1;
     }
     
-    for (int j = (i - 1) * jump + 1; (j < i * jump) && j < n; j++)
-    {
+    int j = 0;
+    for (j = (i - 1) * jump + 1; j > 0 && j < i * jump; j++) {
         cout << j << " ";
         if (arr[j] == x) {
             return j;
@@ -247,30 +248,29 @@ int jumpSearch(int arr[], int x, int n) {
 
 bool findPairs(int arr[], int n, pair<int,int>& pair1, pair<int, int>& pair2)
 {
-   // TODO: If there are two pairs satisfy the condition, assign their values to pair1, pair2 and return true. 
+   // TODO: If there are two pairs satisfy the condition, assign their values to pair1, pair2 and return true.
    // Otherwise, return false.
-   map<int, pair<int,int>> sumMap;
-   
-   for (int i = 0; i < n; i++) {
-       for (int j = i + 1; j < n; j++)
+   map<int, pair<int, int>> sumMap;
+   for (int i = 0; i < n; i++) 
+   {
+       for (int j = i + 1; j < n; j++) 
        {
            int sum = arr[i] + arr[j];
            
-           // check if sum is seen before
-           if (sumMap.find(sum) != sumMap.end())
-           {
-               // sum found, check if distinct;
+           if (sumMap.find(sum) != sumMap.end()) { 
+               // sum found! now check element
                pair<int, int> prevPair = sumMap[sum];
-               if (prevPair.first != i && prevPair.first != j &&
-                   prevPair.second != i && prevPair.second != j)
-                   {
-                       // distinction affirmitive, return
-                       pair1 = make_pair(arr[prevPair.first], arr[prevPair.second]);
-                       pair2 = make_pair(arr[i], arr[j]);
-                       return true;
-                   }
+               if (prevPair.first != i && prevPair.first != j
+               && prevPair.second != i && prevPair.second != j)
+               {
+                   // element valid, return
+                   pair1 = make_pair(arr[i] , arr[j]);
+                   pair2 = make_pair(arr[prevPair.first], arr[prevPair.second]);
+                   return true;
+               }
            }
-           else {
+           
+           else { // new sum, add it to the map
                sumMap[sum] = make_pair(i, j);
            }
        }
@@ -281,7 +281,7 @@ bool findPairs(int arr[], int n, pair<int,int>& pair1, pair<int, int>& pair2)
 template<class T>
 int Heap<T>::getItem(T item) {
     // TODO: return the index of item in heap
-    for (int i = 0; i < this->count; i++) {
+    for (int i = 0; i < count; i++) {
         if (elements[i] == item) {
             return i;
         }
@@ -292,46 +292,42 @@ int Heap<T>::getItem(T item) {
 template<class T>
 void Heap<T>::remove(T item) {
     // TODO: remove the element with value equal to item
-    int pos = getItem(item);
-    if (pos < 0) {
+    int target = getItem(item);
+    if (target < 0) {
         return;
-    } 
-    elements[pos] = elements[--count];
-    reheapUp(pos);
-    reheapDown(pos);
+    }
+    elements[target] = elements[--count];
+    reheapUp(target);
+    reheapDown(target);
 }
 
 template<class T>
 void Heap<T>::clear() {
     // TODO: delete all elements in heap
-    // then reallocate memory as initial state
+    //    then reallocate memory as initial state
     delete[] elements;
     elements = new T[capacity];
     count = 0;
 }
 
 //Helping functions go here
-static void reheapDown(T* arr, int idx,const int& size)
+static void reheapDown(T* arr, int idx, int n)
 {
-    int largest = idx;
-    int left = 2 * idx + 1;
-    int right = left + 1;
-    
-    if (left < size && arr[left] > arr[largest]) {
-        largest = left;
+    if (2 * idx + 1 >= n) {
+        return;
     }
     
-    if (right < size && arr[right] > arr[largest]) {
-        largest = right;
+    int child = 2 * idx + 1;
+    if (child + 1 < n) {
+        child += (arr[child] < arr[child + 1]);
     }
     
-    if (largest != idx) {
-        swap(arr[largest], arr[idx]);
-        reheapDown(arr, largest, size);
+    if (arr[child] > arr[idx]) {
+        swap(arr[child], arr[idx]);
+        reheapDown(arr, child, n);
     }
 }
-
-static void heapSort(T* start, T* end) {
+static void heapSort(T* start, T* end){
     //TODO
     int size = end - start;
     
@@ -342,17 +338,16 @@ static void heapSort(T* start, T* end) {
     
     // sort
     for (int i = size - 1; i > 0; i--) {
-        swap(start[i], start[0]);
-        reheapDown(start, 0, i);
+        swap(start[0], start[i]);   // max elements go to i
+        reheapDown(start, 0, i);    // reheap the remainings
     }
     
-    // print
-    Sorting<T>::printArray(start, end);
+    Sorting<T>::printArray(start,end);
 }
 
 #include <vector>
-#include <utility>
 #include <algorithm>
+#include <utility>
 class PrinterQueue
 {
     // your attributes
@@ -363,13 +358,8 @@ public:
     void addNewRequest(int priority, string fileName)
     {
         // your code here
-        if (printQueue.empty()) {
-            printQueue.push_back(make_pair(priority, fileName));
-            return;
-        }
-        size_t insi = 0; // idx to insert new request
-        while (insi < printQueue.size())
-        {
+        size_t insi = 0;       // pos to insert
+        while (insi < printQueue.size()) {
             if (printQueue[insi].first < priority) {
                 break;
             }
@@ -386,24 +376,24 @@ public:
             cout << "No file to print\n";
             return;
         }
-        cout << printQueue[0].second << "\n";
+        cout << printQueue[0].second << endl;
         printQueue.erase(printQueue.begin());
     }
 };
 
 int leastAfter(vector<int>& nums, int k) {
-    // Create a min heap from the elements of the array
-    priority_queue<int, vector<int>, greater<int>> minHeap(nums.begin(), nums.end());
-
-    // Perform the operation k times
-    for (int i = 0; i < k; ++i) {
-        int smallest = minHeap.top();
-        minHeap.pop();
-
-        // Double the smallest element and push it back
-        minHeap.push(smallest * 2);
+    // STUDENT ANSWER
+    
+    // create a min heap
+    priority_queue<int, vector<int>, greater<int>> heap(nums.begin(), nums.end());
+    
+    // perform operation k times
+    for (int i = 0; i < k; i++)
+    {
+        int smallest = heap.top();
+        heap.pop();
+        heap.push(smallest * 2);
     }
-
-    // The smallest element after k operations
-    return minHeap.top();
+    
+    return heap.top();
 }
