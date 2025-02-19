@@ -130,3 +130,36 @@ int strLen(char* str, int count = 0)
     }
     return strLen(str, count + 1);
 } 
+
+
+void dup_help(string &ans, string s, int time)
+{
+    if(time == 0) return; 
+    ans += s; 
+    dup_help(ans,s,time-1); 
+}
+void smaller(string& s, size_t index = 0)
+{
+    size_t find_ = s.find(')',index); 
+    string sub = s.substr(index + 1,find_ - index - 1);
+
+    int num_of_dup = s[index-1] - '0';
+    string ans = "";
+    dup_help(ans,sub,num_of_dup); 
+
+    s.replace(index-1,find_ - index + 2,ans);
+}
+
+void help(string& s)
+{
+    size_t find = s.rfind('('); 
+    if(find == std::string::npos) return;
+    smaller(s,find);
+    help(s); 
+}
+
+string expand(string s)
+{
+    help(s); 
+    return s; 
+}
