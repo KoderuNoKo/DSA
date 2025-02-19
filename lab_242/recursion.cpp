@@ -34,25 +34,22 @@ int findMax(int* arr, int length)
     return (arr[length - 1] > temp) ? arr[length - 1] : temp;
 }
 
-bool isPalindromeRec(string str, int n) 
+bool isPalindrome(const string& str, size_t i = 0, size_t spaceL = 0, size_t spaceR = 0)
 {
-    if (n >= str.length() / 2) {
-        return true;
-    }
-    return ((str[n] == str[str.length() - n - 1]) && isPalindromeRec(str, n + 1));
-}
+	if (str[i + spaceL] == ' ') {
+		spaceL++;
+	}
+	if (str[str.length() - i - spaceR - 1] == ' ') {
+		spaceR++;
+	}
 
-bool isPalindrome(string str) 
-{
-    // remove all spaces
-    string nospaceStr = "";
-    for (auto ch : str) {
-        if (ch != ' ') {
-            nospaceStr += ch;
-        }
-    }
-    // call check palindrom recursion function
-    return isPalindromeRec(nospaceStr, 0);
+	if (i == str.length() / 2) {
+		return (str[i + spaceL] == str[str.length() - i - spaceR - 1]);
+	}
+	else if (str[i + spaceL] == str[str.length() - i - 1 - spaceR]) {
+		return isPalindrome(str, i + 1, spaceL, spaceR);
+	}
+	else return false;
 }
 
 int findGCD(int a, int b)
@@ -100,7 +97,7 @@ int findLCM(int a, int b)
     return (a / findGCD(a, b)) * b;
 }
 
-int mininumBracketAdd(string s, int i = 0, int missing_open = 0, int missing_close = 0)
+int mininumBracketAdd(const string &s, unsigned int i = 0, int missing_open = 0, int missing_close = 0)
 {
     if (i == s.length()) {
         return missing_close + missing_open;
@@ -119,7 +116,7 @@ int mininumBracketAdd(string s, int i = 0, int missing_open = 0, int missing_clo
 
 string reverseSentence(string s) 
 {
-    int next = s.rfind(' ');
+    size_t next = s.rfind(' ');
     if (next == string::npos) {
         return s;
     }
