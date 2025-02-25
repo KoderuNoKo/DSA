@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<algorithm>
 
 using namespace std;
 
@@ -155,100 +156,140 @@ bool ArrayList<T>::contains(T item)
     return false;
 }
 
-vector<int> updateArrayPerRange(vector<int>& nums, vector<vector<int>>& operations) 
-{
-    // STUDENT ANSWER
-    for (auto op : operations) {
-        for (int i = op.at(0); i <= op.at(1); i++) {
-            nums.at(i) += op.at(2);
-        }
-    }
-}
-
-vector<int> updateArrayPerRange(vector<int>& nums, vector<vector<int>>& operations) 
-{
-    // STUDENT ANSWER
-    vector<int> incr(nums.size(), 0);
-    for (vector<int> op : operations) {
-        incr[op.at(0)] += op.at(2);
-        incr[op.at(1) + 1] -= op.at(2); 
-    }
-
-    for (int i = 1; i < incr.size(); i++) {
-        incr[i] += incr[i - 1];
-    }
-
-    for (int i = 0; i < nums.size(); i++) {
-        nums[i] += incr[i];
+template<class T>
+T ArrayList<T>::removeAt(int index){
+    /*
+    Remove element at index and return removed value 
+    if index is invalid:
+        throw std::out_of_range("index is out of range");
+    */
+    
+    if (index < 0 || index >= count){
+        throw std::out_of_range("index is out of range");
     }
     
-    return nums;
-}
-
-
-
-template <class T>
-class SLinkedList {
-public:
-    class Node; // Forward declaration
-protected:
-    Node* head;
-    Node* tail;
-    int count;
-public:
-    SLinkedList();
-    ~SLinkedList();
-    void    add(const T& e);
-    void    add(int index, const T& e);
-    int     size();
-public:
-    class Node {
-    private:
-        T data;
-        Node* next;
-        friend class SLinkedList<T>;
-    public:
-        Node() {
-            next = 0;
-        }
-        Node(Node* next) {
-            this->next = next;
-        }
-        Node(T data, Node* next) {
-            this->data = data;
-            this->next = next;
-        }
-    };
-};
-
-template <class T>
-void SLinkedList<T>::add(const T& e) {
-    /* Insert an element into the end of the list. */
-    if (count == 0) {
-        this->head = this->tail = new Node(e);
-        return;
+    T removedElement = data[index];
+    
+    for (int i = index; i < count - 1; i++){
+        data[i] = data[i+1];
     }
-    this->tail->next = new Node(e);
-    this->tail = this->tail->next;
-    count++;
+    
+    count--;
+    
+    return removedElement;
 }
 
 template<class T>
-void SLinkedList<T>::add(int index, const T& e) {
-    /* Insert an element into the list at given index. */
-    if (index > count) {
-        throw std::out_of_range("Index is out of range");
-    }
-    Node* newNode = new Node(e);
-    if (index == count) {
-        if (count == 0) {
-            this->head = newNode;
+bool ArrayList<T>::removeItem(T item)
+{
+    for (int i = 0; i < count; i++ ){
+        if (item == data[i]){
+            removeAt(i);
+            return true;
         }
-    }
+    } 
+    return false;
 }
 
 template<class T>
-int SLinkedList<T>::size() {
-    /* Return the length (size) of list */ 
-    return 0;
+void ArrayList<T>::clear()
+{
+    /* 
+        Delete array if array is not NULL
+        Create new array with: size = 0, capacity = 5
+    */
+    if (data != nullptr){
+        delete[] data;
+        data = nullptr;
+    }
+    
+    data = new T[5];
+    count = 0;
+    capacity = 5;
+    
+}
+
+bool consecutiveOnes(vector<int>& nums) 
+{
+    // STUDENT ANSWER
+    int mode = 0;
+    for (int num : nums) {
+        if (mode == 0) {
+            if (num == 1) {
+                mode = 1;
+            }
+        }
+        else if (mode == 1) {
+            if (num != 1) {
+                mode = 2;
+            }
+        }
+        else {
+            if (num == 1) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+int buyCar(int* nums, int length, int k)
+{
+	int carCnt = 0;
+	std::sort(nums, nums + length);
+	for (int i = 0; i < length; i++) {
+		if (k >= nums[i])
+		{
+			carCnt++;
+			k -= nums[i];
+		}
+		else break;
+	}
+	return carCnt;
+}
+
+int equalSumIndex(vector<int>& nums) 
+{
+    // STUDENT ANSWER
+    int sumL = 0;
+    int sumR = 0;
+    int currL = 0;
+    int currR = nums.size() - 1;
+    while (currL < currR) {
+        if (sumL < sumR) {
+            sumL += nums.at(currL++);
+        }
+        if (sumL > sumR) {
+            sumR += nums.at(currR--);
+        }
+        if (sumL == sumR) {
+            if (currL == currR) {
+                return currL;
+            }
+            sumR += nums.at(currR--);
+        }
+    }
+    if (sumL == sumR) {
+        return currR;
+    }
+    return -1;
+}
+
+int longestSublist(vector<string>& words) 
+{
+    // STUDENT ANSWER
+    if (words.size() == 0) return 0;
+    int currentLength = 1; 
+    int maxLength = 0; 
+    
+    for (int i = 1; i < words.size(); i++){
+        if (words[i][0] == words[i-1][0]){
+            currentLength++;
+        } else {
+            maxLength = max(maxLength, currentLength);
+            currentLength = 1;
+        }
+    }
+    maxLength = max(maxLength, currentLength);
+    return maxLength; 
 }
