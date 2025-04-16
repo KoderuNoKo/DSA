@@ -1,7 +1,19 @@
 #include <iostream>
-#include <vector>
 #include <string>
+#include <cstring>
+#include <climits>
+#include <utility>
+#include <vector>
+#include <list>
+#include <stack>
+#include <queue>
+#include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
+#include <functional>
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -104,4 +116,60 @@ ListNode* mergeSortList(ListNode* head) {
     ListNode* second = mergeSortList(middle);
     head = mergeLists(first, second);
     return head;
+}
+
+string minDiffPairs(int* arr, int n){
+    // STUDENT ANSWER
+    std::sort(arr, arr + n);
+    
+    // get mindiff
+    int mindiff = arr[1] - arr[0];
+    for (int i = 2; i < n - 1; i++) {
+        mindiff = min(mindiff, arr[i] - arr[i - 1]);
+    }
+    
+    // filtered result
+    stringstream res;
+    for (int i = 0; i < n - 1; i++) {
+        if (arr[i + 1] - arr[i] == mindiff) {
+            if (res.str() != "") {
+                res << ", ";
+            }
+            res << "(" << arr[i] << ", " << arr[i + 1] << ")";
+        }
+    }
+    return res.str();
+}
+
+struct Element 
+{
+    int val;
+    int freq;
+    int idx;    // for relative order
+
+    Element(int val, int freq, int idx) : val(val), freq(freq), idx(idx) {}
+
+    bool operator<(const Element &other) const {
+        if (this->freq == other.freq) {
+            return this->idx < other.idx;
+        }
+        return this->freq < other.freq;
+    }
+};
+
+void sortByFrequency(int arr[], int n)
+{
+    if (n == 0) {
+        return;
+    }
+
+    // get freq
+    vector<Element> elements;
+    for (int i = 1; i < n; i++) {
+        elements.push_back(Element(arr[i], 1, i));
+        for (int j = 0; j < i; i++)
+    }
+
+    // sort by freq
+    std::sort(elements.begin(), elements.end());
 }
