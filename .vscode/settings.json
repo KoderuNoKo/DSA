@@ -6,7 +6,9 @@
     "algorithm": "cpp",
     "ios": "cpp",
     "type_traits": "cpp",
-    "xutility": "cpp"
+    "xutility": "cpp",
+    "unordered_map": "cpp",
+    "iostream": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "gcc",
   "C_Cpp_Runner.cppCompilerPath": "g++",

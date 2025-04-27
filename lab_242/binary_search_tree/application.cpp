@@ -87,3 +87,21 @@ int kthSmallest(BSTNode* root, int k) {
     // found
     return root->val;
 }
+
+BSTNode* subtreeWithRange(BSTNode* root, int lo, int hi) {
+    // STUDENT ANSWER
+    if (!root) {
+        return nullptr;
+    }
+    if (root->val < lo) {
+        // left subtree out of lower bound
+        return subtreeWithRange(root->right, lo, hi);
+    }
+    if (root->val > hi) {
+        // right subtree out of higher bound
+        return subtreeWithRange(root->left, lo, hi);
+    }
+    root->left = subtreeWithRange(root->left, lo, hi);
+    root->right = subtreeWithRange(root->right, lo, hi);
+    return root;
+}
